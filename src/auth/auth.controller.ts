@@ -32,6 +32,7 @@ import { ApiResponse as IApiResponse } from 'src/common/types/api-response.type'
 import { JWTPayload } from 'src/common/types/jwt-payload.type';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
+import { resetPasswordRequestBodyOpenApiSchema } from 'src/auth/open-api/reset-password';
 
 @Controller('auth')
 export class AuthController {
@@ -183,6 +184,7 @@ export class AuthController {
     description:
       'This endpoint allows users to reset their password using a valid reset token and new password.',
   })
+  @ApiBody({ schema: resetPasswordRequestBodyOpenApiSchema })
   @ApiResponse({
     status: 200,
     description: 'Password reset successfully',
