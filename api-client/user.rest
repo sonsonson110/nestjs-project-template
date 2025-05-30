@@ -1,0 +1,7 @@
+POST {{host}}/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "example@example.com",
+    "password": "Password!123"
+}
