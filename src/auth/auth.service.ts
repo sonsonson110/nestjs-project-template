@@ -4,6 +4,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -18,6 +19,8 @@ import { ResetPasswordDto } from 'src/auth/schema/reset-password.schema';
 @Injectable()
 export class AuthService {
   private readonly resetTokenPrefix = 'reset_token:';
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
@@ -166,10 +169,7 @@ export class AuthService {
     const expiresIn = 15 * 60 * 1000; // 15 minutes
     await this.cacheManager.set(cacheKey, JSON.stringify(tokenData), expiresIn);
 
-    console.log(
-      'AuthService::forgotPasswordAction\t',
-      `Reset token for ${email} is ${resetToken}`,
-    );
+    this.logger.log(`Reset token for ${email} is ${resetToken}`);
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
