@@ -8,31 +8,17 @@ import {
   Res,
   UnauthorizedException,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { forgotPasswordRequestBodyOpenApiSchema } from 'src/auth/open-api/forgot-password';
-import {
-  loginRequestBodyOpenApiSchema,
-  loginResponseOpenApiSchema,
-} from 'src/auth/open-api/login';
-import {
-  ForgotPasswordDto,
-  forgotPasswordSchema,
-} from 'src/auth/schema/forgot-password.schema';
-import { LoginDto, loginSchema } from 'src/auth/schema/login.schema';
-import {
-  ResetPasswordDto,
-  resetPasswordSchema,
-} from 'src/auth/schema/reset-password.schema';
+import { ForgotPasswordDto } from 'src/auth/schema/forgot-password.schema';
+import { LoginDto } from 'src/auth/schema/login.schema';
+import { ResetPasswordDto } from 'src/auth/schema/reset-password.schema';
 import { SessionInfo } from 'src/auth/types/session-info.type';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { ApiResponse as IApiResponse } from 'src/common/types/api-response.type';
 import { JWTPayload } from 'src/common/types/jwt-payload.type';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
-import { resetPasswordRequestBodyOpenApiSchema } from 'src/auth/open-api/reset-password';
 
 @Controller('auth')
 export class AuthController {
@@ -41,17 +27,42 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @UsePipes(new ZodValidationPipe(loginSchema))
   @ApiOperation({
     summary: 'User login',
     description:
       'This endpoint allows users to log in with their credentials. It supports both cookie and token-based responses.',
   })
-  @ApiBody({ schema: loginRequestBodyOpenApiSchema })
   @ApiResponse({
     status: 201,
     description: 'Login successful',
-    schema: loginResponseOpenApiSchema,
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: 'Success message',
+          example: 'Login successfully',
+        },
+        data: {
+          type: 'object',
+          properties: {
+            accessToken: {
+              type: 'string',
+              description: 'JWT access token for authenticated requests',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+            refreshToken: {
+              type: 'string',
+              description: 'JWT refresh token for renewing access tokens',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+          },
+          required: ['accessToken', 'refreshToken'],
+        },
+      },
+      required: ['message'],
+      description: 'Response object containing login details',
+    },
   })
   async login(
     @Body() loginDto: LoginDto,
@@ -155,14 +166,12 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @UsePipes(new ZodValidationPipe(forgotPasswordSchema))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Forgot password',
     description:
       'This endpoint allows users to request a password reset link by providing their email address.',
   })
-  @ApiBody({ schema: forgotPasswordRequestBodyOpenApiSchema })
   @ApiResponse({
     status: 200,
     description: "Password reset link sent to the user's email",
@@ -178,13 +187,11 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(new ZodValidationPipe(resetPasswordSchema))
   @ApiOperation({
     summary: 'Reset password',
     description:
       'This endpoint allows users to reset their password using a valid reset token and new password.',
   })
-  @ApiBody({ schema: resetPasswordRequestBodyOpenApiSchema })
   @ApiResponse({
     status: 200,
     description: 'Password reset successfully',

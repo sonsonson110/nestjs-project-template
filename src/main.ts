@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { ConsoleLogger } from '@nestjs/common';
+import { patchNestJsSwagger } from 'nestjs-zod';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -15,6 +16,8 @@ async function bootstrap() {
   app.use(cookieParser());
 
   if (process.env.NODE_ENV !== 'production') {
+    patchNestJsSwagger();
+
     const config = new DocumentBuilder()
       .setTitle('NestJS template')
       .setDescription('NestJS template API description')

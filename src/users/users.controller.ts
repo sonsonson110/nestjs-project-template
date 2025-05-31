@@ -1,15 +1,7 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiResponse as IApiResponse } from 'src/common/types/api-response.type';
-import {
-  createUserRequestBodyOpenApiSchema,
-  createUserResponseOpenApiSchema,
-} from 'src/users/open-api/create-user';
-import {
-  CreateUserDto,
-  createUserSchema,
-} from 'src/users/schema/create-user.schema';
+import { CreateUserDto } from 'src/users/schema/create-user.schema';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -17,17 +9,52 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @UsePipes(new ZodValidationPipe(createUserSchema))
   @ApiOperation({
     summary: 'Create a new user',
     description:
       'This endpoint allows you to create a new user with the provided details.',
   })
-  @ApiBody({ schema: createUserRequestBodyOpenApiSchema })
   @ApiResponse({
     status: 201,
     description: 'Successfully retrieved users',
-    schema: createUserResponseOpenApiSchema,
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'User created successfully',
+        },
+        data: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              example: '123e4567-e89b-12d3-a456-426614174000',
+            },
+            username: {
+              type: 'string',
+              pattern: '^[a-zA-Z0-9_-]{3,50}$',
+              description:
+                'Username of the user (3-50 characters, alphanumeric and underscores)',
+              example: 'user123',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'user@example.com',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              example: '2023-10-01T12:00:00Z',
+            },
+          },
+          required: ['id', 'email', 'username', 'createdAt'],
+        },
+      },
+      required: ['message', 'data'],
+      description: 'Response object containing user creation details',
+    },
   })
   async create(@Body() createUserDto: CreateUserDto): Promise<IApiResponse> {
     const result = await this.usersService.createUser(createUserDto);

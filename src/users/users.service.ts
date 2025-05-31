@@ -35,4 +35,6 @@ export class UsersService {
       },
     });
   }
+
+  async findAllUsers() {}
 }
