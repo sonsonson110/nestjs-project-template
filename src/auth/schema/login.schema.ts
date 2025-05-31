@@ -1,7 +1,21 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  emailOrUsername: z
+    .string()
+    .min(1, { message: 'Email or username is required' })
+    .refine(
+      (value) => {
+        // Check if it's a valid email or a valid username
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const usernameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+
+        return emailRegex.test(value) || usernameRegex.test(value);
+      },
+      {
+        message: 'Must be a valid email address or username',
+      },
+    ),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' })

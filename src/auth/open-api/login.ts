@@ -1,11 +1,23 @@
 export const loginRequestBodyOpenApiSchema = {
   type: 'object',
   properties: {
-    email: {
-      type: 'string',
-      format: 'email',
-      description: 'User email address',
-      example: 'user@example.com',
+    emailOrUsername: {
+      description: 'User email address or username for login',
+      oneOf: [
+        {
+          type: 'string',
+          format: 'email',
+          description: 'Email address of the user',
+          example: 'user@example.com',
+        },
+        {
+          type: 'string',
+          pattern: '^[a-zA-Z0-9_-]{3,50}$',
+          description:
+            'Username of the user (3-50 characters, alphanumeric and underscores)',
+          example: 'user123',
+        },
+      ],
     },
     password: {
       type: 'string',
@@ -21,7 +33,7 @@ export const loginRequestBodyOpenApiSchema = {
       example: 'cookie',
     },
   },
-  required: ['email', 'password'],
+  required: ['emailOrUsername', 'password'],
 };
 
 export const loginResponseOpenApiSchema = {

@@ -19,9 +19,20 @@ export class UsersService {
     if (emailExists) {
       throw new ConflictException('User with this email already exists');
     }
+    const usernameExists = await this.prisma.user.findFirst({
+      where: { username: dto.username },
+      select: { id: true },
+    });
+    if (usernameExists) {
+      throw new ConflictException('User with this username already exists');
+    }
     const hashedPassword = await this.hasherService.hash(dto.password);
     return this.prisma.user.create({
-      data: { email: dto.email, passwordHash: hashedPassword },
+      data: {
+        username: dto.username,
+        email: dto.email,
+        passwordHash: hashedPassword,
+      },
     });
   }
 }

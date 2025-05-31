@@ -1,7 +1,10 @@
 model User {
     id           String   @id @default(cuid())
+    username     String   @unique @db.VarChar(50)
     email        String   @unique @db.VarChar(255)
     passwordHash String
+    role         Role       @default(USER)
+
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 

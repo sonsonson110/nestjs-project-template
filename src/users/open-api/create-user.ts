@@ -1,6 +1,13 @@
 export const createUserRequestBodyOpenApiSchema = {
   type: 'object',
   properties: {
+    username: {
+      type: 'string',
+      pattern: '^[a-zA-Z0-9_-]{3,50}$',
+      description:
+        'Username of the user (3-50 characters, alphanumeric and underscores)',
+      example: 'user123',
+    },
     email: {
       type: 'string',
       format: 'email',
@@ -15,7 +22,7 @@ export const createUserRequestBodyOpenApiSchema = {
       example: 'Password123!',
     },
   },
-  required: ['email', 'password'],
+  required: ['username', 'email', 'password'],
 };
 
 export const createUserResponseOpenApiSchema = {
@@ -34,6 +41,13 @@ export const createUserResponseOpenApiSchema = {
           description: 'Unique identifier for the user',
           example: '123e4567-e89b-12d3-a456-426614174000',
         },
+        username: {
+          type: 'string',
+          pattern: '^[a-zA-Z0-9_-]{3,50}$',
+          description:
+            'Username of the user (3-50 characters, alphanumeric and underscores)',
+          example: 'user123',
+        },
         email: {
           type: 'string',
           format: 'email',
@@ -47,7 +61,7 @@ export const createUserResponseOpenApiSchema = {
           example: '2023-10-01T12:00:00Z',
         },
       },
-      required: ['id', 'email', 'createdAt'],
+      required: ['id', 'email', 'username', 'createdAt'],
     },
   },
   required: ['message', 'data'],

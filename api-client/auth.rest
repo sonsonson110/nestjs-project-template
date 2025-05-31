@@ -1,5 +1,5 @@
 @email=example@example.com
-@password=NewPassword!123
+@password=Password!123
 
 ###
 # @name session
@@ -7,7 +7,7 @@ POST {{host}}/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "{{email}}",
+  "emailOrUsername": "{{email}}",
   "password": "{{password}}",
   "responseType": "json"
 }

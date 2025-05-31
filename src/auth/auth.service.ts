@@ -34,17 +34,20 @@ export class AuthService {
     accessToken: string;
     refreshToken?: string;
   }> {
-    const user = await this.prismaService.user.findUnique({
-      where: { email: dto.email },
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        OR: [{ email: dto.emailOrUsername }, { username: dto.emailOrUsername }],
+      },
       select: {
         id: true,
+        username: true,
         email: true,
         passwordHash: true,
       },
     });
 
     if (!user) {
-      throw new BadRequestException('Email is not exist');
+      throw new BadRequestException('User is not exist');
     }
 
     const passwordMatch = await this.hasher.verify(
@@ -57,6 +60,7 @@ export class AuthService {
 
     const accessPayload = {
       sub: user.id,
+      username: user.username,
       email: user.email,
     } satisfies JWTPayload;
 
